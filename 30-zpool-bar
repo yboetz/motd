@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# config
+max_usage=90
+bar_width=50
+clear="\e[39m\e[0m"
+dim="\e[2m"
+
+zpools=($(zpool list -Ho name | awk '{print $0}'))
+
+printf "\nzpool usage:\n"
+
+for zpool in "${zpools[@]}"
+do
+    # get zpool usage
+    line=$(zpool list -Ho name,cap,size "${zpool}")
+    usage=$(echo "$line" | awk '{print $2}' | sed 's/%//')
+    used_width=$((($usage*$bar_width)/100))
+    # color is green if usage < max_usage, else red
+    if [ "${usage}" -ge "${max_usage}" ]; then
+        color="\e[31m"
+    else
+        color="\e[32m"
+    fi
+    # print green/red bar until used_width
+    bar="${color}"
+    for sep in $(seq 1 $used_width); do
+        bar+="="
+    done
+    # print dimmmed bar until end
+    bar+="${clear}${dim}"
+    for sep in $(seq 1 $(($bar_width-$used_width))); do
+        bar+="="
+    done
+    bar="[${bar}${clear}]"
+    # print usage line & bar
+    echo "${line}" | awk '{ printf("%-10s%+3s used out of %+5s\n", $1, $2, $3); }' | sed -e 's/^/  /'
+    echo -e "${bar}" | sed -e 's/^/  /'
+done
