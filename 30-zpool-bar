@@ -5,8 +5,8 @@ max_usage=90
 bar_width=50
 # colors
 white="\e[39m"
-green="\e[32m"
-red="\e[31m"
+green="\e[1;32m"
+red="\e[1;31m"
 dim="\e[2m"
 undim="\e[0m"
 
