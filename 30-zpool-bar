@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # config
-max_usage=70
+max_usage=90
 bar_width=50
 # colors
 white="\e[39m"
@@ -10,8 +10,12 @@ red="\e[31m"
 dim="\e[2m"
 undim="\e[0m"
 
-mapfile -t zpools < <(zpool list -Ho name,cap,size)
+# zpool status
+printf "\nzpool status:\n"
+zpool status -x | sed -e 's/^/  /'
 
+# zpool usage
+mapfile -t zpools < <(zpool list -Ho name,cap,size)
 printf "\nzpool usage:\n"
 
 for line in "${zpools[@]}"; do
