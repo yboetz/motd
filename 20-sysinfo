@@ -11,16 +11,16 @@ PROCESS_ROOT=`echo "$PROCESS"| grep root | awk {'print $2'}`
 PROCESS_USER=`echo "$PROCESS"| grep -v root | awk {'print $2'} | awk '{ SUM += $1} END { print SUM }'`
 
 W="\e[0;39m"
-R="\e[1;31m"
-B="\e[0;39m"
+G="\e[1;32m"
 
 echo -e "
-$W  Distro........: $B`cat /etc/*release | grep "PRETTY_NAME" | cut -d "=" -f 2- | sed 's/"//g'`
-$W  Kernel........: $B`uname -sr`
+${W}system info:
+$W  Distro........: $W`cat /etc/*release | grep "PRETTY_NAME" | cut -d "=" -f 2- | sed 's/"//g'`
+$W  Kernel........: $W`uname -sr`
 
-$W  Uptime........: $B`uptime -p`
-$W  Load..........: $R$LOAD1$B (1m) $R$LOAD5$B (5m) $R$LOAD15$B (15m)
-$W  Processes.....:$B root ($R$PROCESS_ROOT$B), user ($R$PROCESS_USER$B) | ($R$PROCESS_ALL$B) total
+$W  Uptime........: $W`uptime -p`
+$W  Load..........: $G$LOAD1$W (1m), $G$LOAD5$W (5m), $G$LOAD15$W (15m)
+$W  Processes.....:$W $G$PROCESS_ROOT$W (root), $G$PROCESS_USER$W (user) | $G$PROCESS_ALL$W (total)
 
-$W  CPU...........: $B`cat /proc/cpuinfo | grep "model name" | cut -d ' ' -f3- | awk {'print $0'} | head -1`
-$W  Memory........: $R$USED$B used, $R$FREE$B free, $R$TOTAL$B in total$W"
+$W  CPU...........: $W`cat /proc/cpuinfo | grep "model name" | cut -d ' ' -f3- | awk {'print $0'} | head -1`
+$W  Memory........: $G$USED$W used, $G$FREE$W free, $G$TOTAL$W in total$W"
