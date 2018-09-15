@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# set column width
+COLUMN_WIDTH=3
+
+services=("fail2ban" "ufw" "lxd" "netdata" "zed" "smartd" "postfix")
+# sort services
+IFS=$'\n' services=($(sort <<<"${services[*]}"))
+unset IFS
+
+service_status=()
+# get status of all services
+for service in "${services[@]}"
+do
+    service_status+=($(systemctl is-active "$service"))
+done
+
+out=""
+for i in ${!services[@]}; do
+    # color green if service is active, else red
+    if [[ "${service_status[$i]}" == "active" ]]; then
+        out+="${services[$i]}:,\e[32m● ${service_status[$i]}\e[0m,"
+    else
+        out+="${services[$i]}:,\e[31m▲ ${service_status[$i]}\e[0m,"
+    fi
+    # insert \n every $COLUMN_WIDTH column
+    if [ $((($i+1) % $COLUMN_WIDTH)) -eq 0 ]; then
+        out+="\n"
+    fi
+done
+out+="\n"
+
+printf "\nservices:\n"
+printf "$out" | column -ts $',' | sed -e 's/^/  /'
