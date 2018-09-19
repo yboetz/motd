@@ -1,4 +1,4 @@
 #!/bin/bash
 
 printf "\n"
-/usr/bin/uptime -p
+uptime -p
