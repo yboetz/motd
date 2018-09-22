@@ -1,0 +1,42 @@
+#!/bin/bash
+
+
+# config
+max_usage=90
+bar_width=50
+# colors
+white="\e[39m"
+green="\e[1;32m"
+red="\e[1;31m"
+dim="\e[2m"
+undim="\e[0m"
+
+# zpool usage
+mapfile -t dfs < <(df -H -x tmpfs -x devtmpfs --output=target,pcent,size | tail -n+2)
+printf "\ndisk usage:\n"
+
+for line in "${dfs[@]}"; do
+    # get zpool usage
+    usage=$(echo "$line" | awk '{print $2}' | sed 's/%//')
+    used_width=$((($usage*$bar_width)/100))
+    # color is green if usage < max_usage, else red
+    if [ "${usage}" -ge "${max_usage}" ]; then
+        color=$red
+    else
+        color=$green
+    fi
+    # print green/red bar until used_width
+    bar="[${color}"
+    for ((i=0; i<$used_width; i++)); do
+        bar+="="
+    done
+    # print dimmmed bar until end
+    bar+="${white}${dim}"
+    for ((i=$used_width; i<$bar_width; i++)); do
+        bar+="="
+    done
+    bar+="${undim}]"
+    # print usage line & bar
+    echo "${line}" | awk '{ printf("%-30s%+3s used out of %+5s\n", $1, $2, $3); }' | sed -e 's/^/  /'
+    echo -e "${bar}" | sed -e 's/^/  /'
+done
