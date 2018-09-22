@@ -40,6 +40,6 @@ for line in "${zpools[@]}"; do
     done
     bar+="${undim}]"
     # print usage line & bar
-    echo "${line}" | awk '{ printf("%-10s%+3s used out of %+5s\n", $1, $2, $3); }' | sed -e 's/^/  /'
+    echo "${line}" | awk '{ printf("%-30s%+3s used out of %+5s\n", $1, $2, $3); }' | sed -e 's/^/  /'
     echo -e "${bar}" | sed -e 's/^/  /'
 done
