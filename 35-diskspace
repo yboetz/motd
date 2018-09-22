@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # config
 max_usage=90
 bar_width=50
@@ -11,12 +10,12 @@ red="\e[1;31m"
 dim="\e[2m"
 undim="\e[0m"
 
-# zpool usage
-mapfile -t dfs < <(df -H -x tmpfs -x devtmpfs --output=target,pcent,size | tail -n+2)
+# disk usage: ignore zfs, squashfs & tmpfs
+mapfile -t dfs < <(df -H -x zfs -x squashfs -x tmpfs -x devtmpfs --output=target,pcent,size | tail -n+2)
 printf "\ndisk usage:\n"
 
 for line in "${dfs[@]}"; do
-    # get zpool usage
+    # get disk usage
     usage=$(echo "$line" | awk '{print $2}' | sed 's/%//')
     used_width=$((($usage*$bar_width)/100))
     # color is green if usage < max_usage, else red
