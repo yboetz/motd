@@ -42,7 +42,7 @@ for i in "${!disks[@]}"; do
         status_color=$red
     fi
     # print temp & smartd error
-    out+="${disk}:,${color}${temp}°C${undim} | ${status_color}${status}${undim},"
+    out+="${disk}:,${color}${temp}C${undim} | ${status_color}${status}${undim},"
     # insert \n every $COLUMNS column
     if [ $((($i+1) % $COLUMNS)) -eq 0 ]; then
         out+="\n"
