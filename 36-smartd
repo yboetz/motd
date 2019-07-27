@@ -13,6 +13,7 @@ undim="\e[0m"
 
 # disks to check
 disks=(sda sdb sdc sdd sde sdf sdg sdi)
+disknames=(sda sdb sdc sdd sde sdf sdg sdi)
 logfiles='/var/log/syslog /var/log/syslog.1'
 
 # get all lines with smartd entries from syslog
@@ -21,6 +22,12 @@ mapfile -t lines < <(grep -hiP 'smartd\[[[:digit:]]+\]:' $logfiles | grep -iP "(
 out=""
 for i in "${!disks[@]}"; do
     disk=${disks[$i]}
+    # use disknames if given
+    if [ -z "${disknames}" ]; then
+        name=$disk
+    else
+        name=${disknames[$i]}
+    fi
     uuid=$(blkid -s UUID -o value "/dev/${disk}")
     #mapfile -t disklines < <(printf -- '%s\n' "${lines[@]}" | grep "${uuid}")
     temp=$(printf -- '%s\n' "${lines[@]}" | grep "${uuid}" | grep -m 1 "Temperature_Celsius" | awk '{ print $NF }')
@@ -42,7 +49,7 @@ for i in "${!disks[@]}"; do
         status_color=$red
     fi
     # print temp & smartd error
-    out+="${disk}:,${color}${temp}C${undim} | ${status_color}${status}${undim},"
+    out+="${name}:,${color}${temp}C${undim} | ${status_color}${status}${undim},"
     # insert \n every $COLUMNS column
     if [ $((($i+1) % $COLUMNS)) -eq 0 ]; then
         out+="\n"
