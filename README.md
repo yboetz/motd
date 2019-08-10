@@ -9,6 +9,7 @@ Collection of my 'Message of the Day' scripts.
 
   * update-motd
   * figlet & lolcat (for `10-display-name`)
+  * hddtemp (for `36-diskstatus`)
 
 
 ### How do I set it up?
