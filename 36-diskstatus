@@ -14,33 +14,40 @@ undim="\e[0m"
 # disks to check
 disks=(sda sdb sdc sdd sde sdf sdg sdi)
 disknames=(sda sdb sdc sdd sde sdf sdg sdi)
+
+# hddtemp
+hddtemp_host=localhost
+hddtemp_port=7634
+
+# logfiles to check
 logfiles='/var/log/syslog /var/log/syslog.1'
 
 # get all lines with smartd entries from syslog
-mapfile -t lines < <(grep -hiP 'smartd\[[[:digit:]]+\]:' $logfiles | grep -iP "(Temperature_Celsius|previous self-test)" | sort -r)
+lines=$(tac $logfiles | grep -hiP 'smartd\[[[:digit:]]+\]:' | grep -iP "previous self-test")
+# use nc to query temps from hddtemp daemon
+hddtemp=$(nc $hddtemp_host $hddtemp_port | sed 's/|//m' | sed 's/||/ \n/g')
 
 out=""
 for i in "${!disks[@]}"; do
     disk=${disks[$i]}
     # use disknames if given
-    if [ -z "${disknames}" ]; then
-        name=$disk
-    else
-        name=${disknames[$i]}
+    diskname=${disknames[$i]}
+    if [ -z "${diskname}" ]; then
+        diskname=$disk
     fi
     uuid=$(blkid -s UUID -o value "/dev/${disk}")
-    #mapfile -t disklines < <(printf -- '%s\n' "${lines[@]}" | grep "${uuid}")
-    temp=$(printf -- '%s\n' "${lines[@]}" | grep "${uuid}" | grep -m 1 "Temperature_Celsius" | awk '{ print $NF }')
-    status=$(printf -- '%s\n' "${lines[@]}" | grep "${uuid}" | grep -m 1 -oP "previous self-test.*" | cut -d' '  -f4-)
+    status=$( (grep "${uuid}" <<< "${lines}") | grep -m 1 -oP "previous self-test.*" | awk '{ print $4 " " $5 }')
+    temp=$( (grep "${disk}" <<< "${hddtemp}") | awk -F'|' '{ print $3 }')
+
     # color green if temp <= MAX_TEMP, else red
     if [[ "${temp}" -gt "${MAX_TEMP}" ]]; then
         color=$red
     else
         color=$green
     fi
-    # if temp > 80 assume reading is wrong and set temp to "--"
-    if [[ "${temp}" -gt 80 ]]; then
-        temp="--"
+    # add "C" if temp is numeric
+    if [[ "$temp" =~ ^[0-9]+$ ]]; then
+        temp="${temp}C"
     fi
     # color green if status is "without error", else red
     if [[ "${status}" == "without error" ]]; then
@@ -48,8 +55,9 @@ for i in "${!disks[@]}"; do
     else
         status_color=$red
     fi
+
     # print temp & smartd error
-    out+="${name}:,${color}${temp}C${undim} | ${status_color}${status}${undim},"
+    out+="${diskname}:,${color}${temp}${undim} | ${status_color}${status}${undim},"
     # insert \n every $COLUMNS column
     if [ $((($i+1) % $COLUMNS)) -eq 0 ]; then
         out+="\n"
@@ -57,5 +65,5 @@ for i in "${!disks[@]}"; do
 done
 out+="\n"
 
-printf "\nsmartd status:\n"
+printf "\ndisk status:\n"
 printf "$out" | column -ts $',' | sed -e 's/^/  /'
