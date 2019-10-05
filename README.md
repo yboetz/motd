@@ -8,8 +8,8 @@ Collection of my 'Message of the Day' scripts.
 ### Requirements
 
   * [update-motd](https://launchpad.net/update-motd)
-  * figlet & lolcat (for `10-display-name`)
-  * hddtemp (for `36-diskstatus`)
+  * [figlet](http://www.figlet.org/) & [lolcat](https://github.com/busyloop/lolcat) (for `10-display-name`)
+  * [hddtemp](https://savannah.nongnu.org/projects/hddtemp/) (for `36-diskstatus`)
 
 
 ### How do I set it up?
