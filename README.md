@@ -7,7 +7,7 @@ Collection of my 'Message of the Day' scripts.
 
 ### Requirements
 
-  * update-motd
+  * [update-motd](https://launchpad.net/update-motd)
   * figlet & lolcat (for `10-display-name`)
   * hddtemp (for `36-diskstatus`)
 
