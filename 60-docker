@@ -7,7 +7,7 @@ green="\e[1;32m"
 red="\e[1;31m"
 undim="\e[0m"
 
-mapfile -t containers < <(docker ps -a --format '{{.Names}}\t{{.Status}}' | awk '{ print $1,$2 }')
+mapfile -t containers < <(docker ps -a --format '{{.Names}}\t{{.Status}}' | sort -k1 | awk '{ print $1,$2 }')
 
 out=""
 for i in "${!containers[@]}"; do
