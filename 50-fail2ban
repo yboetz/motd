@@ -1,7 +1,7 @@
 #!/bin/bash
 
 logfile='/var/log/fail2ban.log*'
-mapfile -t lines < <(grep -hioP '(\[[a-z-]+\]) (ban|unban)' $logfile | sort | uniq -c)
+mapfile -t lines < <(zgrep -hioP '(\[[a-z-]+\]) (ban|unban)' $logfile | sort | uniq -c)
 jails=($(printf -- '%s\n' "${lines[@]}" | grep -oP '\[\K[^\]]+' | sort | uniq))
 
 out=""
