@@ -1,12 +1,12 @@
 #!/bin/bash
 
 logfile='/var/log/fail2ban.log*'
-mapfile -t lines < <(grep -hioP '(\[[a-z-]+\]) (ban|unban)' $logfile | sort | uniq -c)
+mapfile -t lines < <(grep -hioP '(\[[a-z-]+\]) ?(?:restore)? (ban|unban)' $logfile | sort | uniq -c)
 jails=($(printf -- '%s\n' "${lines[@]}" | grep -oP '\[\K[^\]]+' | sort | uniq))
 
 out=""
 for jail in ${jails[@]}; do
-    bans=$(printf -- '%s\n' "${lines[@]}" | grep -iP "[[:digit:]]+ \[$jail\] ban" | awk '{print $1}')
+    bans=$(printf -- '%s\n' "${lines[@]}" | grep -iP "[[:digit:]]+ \[$jail\] ?(?:restore)? ban" | awk '{print $1}')
     unbans=$(printf -- '%s\n' "${lines[@]}" | grep -iP "[[:digit:]]+ \[$jail\] unban" | awk '{print $1}')
     bans=${bans:-0} # default value
     unbans=${unbans:-0} # default value
