@@ -12,7 +12,8 @@ for jail in ${jails[@]}; do
     bans=${bans:-0} # default value
     restores=${restores:-0} # default value
     unbans=${unbans:-0} # default value
-    diff=$(($bans+$restores-$unbans))
+    bans=$(($bans+$restores))
+    diff=$(($bans-$unbans))
     out+=$(printf "$jail, %+3s bans, %+3s unbans, %+3s active" $bans $unbans $diff)"\n"
 done
 
