@@ -25,7 +25,7 @@ logfiles='/var/log/syslog /var/log/syslog.1'
 # get all lines with smartd entries from syslog
 lines=$(tac $logfiles | grep -hiP 'smartd\[[[:digit:]]+\]:' | grep -iP "previous self-test")
 # use nc to query temps from hddtemp daemon
-hddtemp=$(nc $hddtemp_host $hddtemp_port | sed 's/|//m' | sed 's/||/ \n/g')
+hddtemp=$(timeout 0.01 nc $hddtemp_host $hddtemp_port | sed 's/|//m' | sed 's/||/ \n/g')
 
 out=""
 for i in "${!disks[@]}"; do
