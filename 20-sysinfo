@@ -21,7 +21,7 @@ ${W}system info:
 $W  Distro......: $W`cat /etc/*release | grep "PRETTY_NAME" | cut -d "=" -f 2- | sed 's/"//g'`
 $W  Kernel......: $W`uname -sr`
 
-$W  Uptime......: $W`uptime -p`
+$W  Uptime......: $W`uptime -p | sed "s/\([0-9]\+\)/${G@E}\1${W@E}/g"`
 $W  Load........: $G$LOAD1$W (1m), $G$LOAD5$W (5m), $G$LOAD15$W (15m)
 $W  Processes...:$W $G$PROCESS_ROOT$W (root), $G$PROCESS_USER$W (user), $G$PROCESS_ALL$W (total)
 
